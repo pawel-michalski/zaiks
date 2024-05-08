@@ -7,14 +7,14 @@ import org.sortapp.algorithm.DefaultSortingAlgorithmFactory;
 import org.sortapp.application.SortingUseCase;
 
 public class Main {
-    public static void main(String[] args) {
-        SortingUseCase sortingUseCase = new SortingUseCase(
-                new ResourceDataSource(),
-                new ConsoleAlgorithmSelector(),
-                new LoggingResultOutput(),
-                new DefaultSortingAlgorithmFactory()
-        );
+  public static void main(String[] args) {
+    SortingUseCase sortingUseCase =
+        new SortingUseCase(
+            new ResourceDataSource(),
+            new ConsoleAlgorithmSelector(),
+            new LoggingResultOutput(),
+            new DefaultSortingAlgorithmFactory());
 
-        sortingUseCase.execute();
-    }
+    sortingUseCase.execute();
+  }
 }

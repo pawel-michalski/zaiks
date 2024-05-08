@@ -1,3 +1,11 @@
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.sortapp.algorithm.BubbleSortAlgorithm;
@@ -6,111 +14,98 @@ import org.sortapp.application.SortingAlgorithmFactory;
 import org.sortapp.application.SortingUseCase;
 import org.sortapp.domain.SortingResult;
 import org.sortapp.domain.exception.ResourceException;
-
 import org.sortapp.domain.port.AlgorithmSelector;
 import org.sortapp.domain.port.DataSource;
 import org.sortapp.domain.port.ResultOutput;
-import org.sortapp.domain.port.SortingAlgorithm;
-
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class SortingUseCaseTest {
 
-    @Test
-    void execute_withBubbleSort_shouldProcessDataCorrectly() throws ResourceException {
-        // Setup
-        int[] testData = {5, 3, 1, 4, 2};
-        int[] expectedSorted = {1, 2, 3, 4, 5};
+  @Test
+  void execute_withBubbleSort_shouldProcessDataCorrectly() throws ResourceException {
+    // Setup
+    int[] testData = {5, 3, 1, 4, 2};
+    int[] expectedSorted = {1, 2, 3, 4, 5};
 
-        DataSource dataSource = mock(DataSource.class);
-        when(dataSource.fetchData()).thenReturn(testData);
+    DataSource dataSource = mock(DataSource.class);
+    when(dataSource.fetchData()).thenReturn(testData);
 
-        AlgorithmSelector algorithmSelector = mock(AlgorithmSelector.class);
-        when(algorithmSelector.selectAlgorithm()).thenReturn("bubble");
+    AlgorithmSelector algorithmSelector = mock(AlgorithmSelector.class);
+    when(algorithmSelector.selectAlgorithm()).thenReturn("bubble");
 
-        ResultOutput resultOutput = mock(ResultOutput.class);
+    ResultOutput resultOutput = mock(ResultOutput.class);
 
-        SortingAlgorithmFactory algorithmFactory = mock(SortingAlgorithmFactory.class);
-        when(algorithmFactory.createAlgorithm("bubble")).thenReturn(new BubbleSortAlgorithm());
+    SortingAlgorithmFactory algorithmFactory = mock(SortingAlgorithmFactory.class);
+    when(algorithmFactory.createAlgorithm("bubble")).thenReturn(new BubbleSortAlgorithm());
 
-        // Execute
-        SortingUseCase useCase = new SortingUseCase(dataSource, algorithmSelector, resultOutput, algorithmFactory);
-        useCase.execute();
+    SortingUseCase useCase =
+        new SortingUseCase(dataSource, algorithmSelector, resultOutput, algorithmFactory);
+    useCase.execute();
 
-        // Verify
-        verify(dataSource).fetchData();
-        verify(algorithmSelector).selectAlgorithm();
-        verify(algorithmFactory).createAlgorithm("bubble");
-        verify(resultOutput).displayFetchedData(testData);
+    verify(dataSource).fetchData();
+    verify(algorithmSelector).selectAlgorithm();
+    verify(algorithmFactory).createAlgorithm("bubble");
+    verify(resultOutput).displayFetchedData(testData);
 
-        // Capture and verify the SortingResult
-        ArgumentCaptor<SortingResult> resultCaptor = ArgumentCaptor.forClass(SortingResult.class);
-        verify(resultOutput).displaySortedResult(eq("bubble"), resultCaptor.capture());
+    ArgumentCaptor<SortingResult> resultCaptor = ArgumentCaptor.forClass(SortingResult.class);
+    verify(resultOutput).displaySortedResult(eq("bubble"), resultCaptor.capture());
 
-        SortingResult capturedResult = resultCaptor.getValue();
-        assertArrayEquals(expectedSorted, capturedResult.sortedData());
-        assertTrue(capturedResult.sortingTime() >= 0);
-    }
+    SortingResult capturedResult = resultCaptor.getValue();
+    assertArrayEquals(expectedSorted, capturedResult.sortedData());
+    assertTrue(capturedResult.sortingTime() >= 0);
+  }
 
-    @Test
-    void execute_withMergeSort_shouldProcessDataCorrectly() throws ResourceException {
-        // Setup
-        int[] testData = {10, 2, 8, 6, 4};
-        int[] expectedSorted = {2, 4, 6, 8, 10};
+  @Test
+  void execute_withMergeSort_shouldProcessDataCorrectly() throws ResourceException {
 
-        DataSource dataSource = mock(DataSource.class);
-        when(dataSource.fetchData()).thenReturn(testData);
+    int[] testData = {10, 2, 8, 6, 4};
+    int[] expectedSorted = {2, 4, 6, 8, 10};
 
-        AlgorithmSelector algorithmSelector = mock(AlgorithmSelector.class);
-        when(algorithmSelector.selectAlgorithm()).thenReturn("merge");
+    DataSource dataSource = mock(DataSource.class);
+    when(dataSource.fetchData()).thenReturn(testData);
 
-        ResultOutput resultOutput = mock(ResultOutput.class);
+    AlgorithmSelector algorithmSelector = mock(AlgorithmSelector.class);
+    when(algorithmSelector.selectAlgorithm()).thenReturn("merge");
 
-        SortingAlgorithmFactory algorithmFactory = mock(SortingAlgorithmFactory.class);
-        when(algorithmFactory.createAlgorithm("merge")).thenReturn(new MergeSortAlgorithm());
+    ResultOutput resultOutput = mock(ResultOutput.class);
 
-        // Execute
-        SortingUseCase useCase = new SortingUseCase(dataSource, algorithmSelector, resultOutput, algorithmFactory);
-        useCase.execute();
+    SortingAlgorithmFactory algorithmFactory = mock(SortingAlgorithmFactory.class);
+    when(algorithmFactory.createAlgorithm("merge")).thenReturn(new MergeSortAlgorithm());
 
-        // Verify
-        verify(dataSource).fetchData();
-        verify(algorithmSelector).selectAlgorithm();
-        verify(algorithmFactory).createAlgorithm("merge");
-        verify(resultOutput).displayFetchedData(testData);
+    SortingUseCase useCase =
+        new SortingUseCase(dataSource, algorithmSelector, resultOutput, algorithmFactory);
+    useCase.execute();
 
-        // Capture and verify the SortingResult
-        ArgumentCaptor<SortingResult> resultCaptor = ArgumentCaptor.forClass(SortingResult.class);
-        verify(resultOutput).displaySortedResult(eq("merge"), resultCaptor.capture());
+    verify(dataSource).fetchData();
+    verify(algorithmSelector).selectAlgorithm();
+    verify(algorithmFactory).createAlgorithm("merge");
+    verify(resultOutput).displayFetchedData(testData);
 
-        SortingResult capturedResult = resultCaptor.getValue();
-        assertArrayEquals(expectedSorted, capturedResult.sortedData());
-        assertTrue(capturedResult.sortingTime() >= 0);
-    }
+    ArgumentCaptor<SortingResult> resultCaptor = ArgumentCaptor.forClass(SortingResult.class);
+    verify(resultOutput).displaySortedResult(eq("merge"), resultCaptor.capture());
 
-    @Test
-    void execute_withException_shouldHandleGracefully() throws ResourceException {
-        // Setup
-        DataSource dataSource = mock(DataSource.class);
-        when(dataSource.fetchData()).thenThrow(new ResourceException("Test exception"));
+    SortingResult capturedResult = resultCaptor.getValue();
+    assertArrayEquals(expectedSorted, capturedResult.sortedData());
+    assertTrue(capturedResult.sortingTime() >= 0);
+  }
 
-        AlgorithmSelector algorithmSelector = mock(AlgorithmSelector.class);
-        when(algorithmSelector.selectAlgorithm()).thenReturn("bubble");
+  @Test
+  void execute_withException_shouldHandleGracefully() throws ResourceException {
+    DataSource dataSource = mock(DataSource.class);
+    when(dataSource.fetchData()).thenThrow(new ResourceException("Test exception"));
 
-        ResultOutput resultOutput = mock(ResultOutput.class);
+    AlgorithmSelector algorithmSelector = mock(AlgorithmSelector.class);
+    when(algorithmSelector.selectAlgorithm()).thenReturn("bubble");
 
-        SortingAlgorithmFactory algorithmFactory = mock(SortingAlgorithmFactory.class);
+    ResultOutput resultOutput = mock(ResultOutput.class);
 
-        // Execute
-        SortingUseCase useCase = new SortingUseCase(dataSource, algorithmSelector, resultOutput, algorithmFactory);
-        useCase.execute();
+    SortingAlgorithmFactory algorithmFactory = mock(SortingAlgorithmFactory.class);
 
-        // Verify
-        verify(dataSource).fetchData();
-        verify(algorithmSelector).selectAlgorithm();
-        verifyNoInteractions(resultOutput);
-    }
+    SortingUseCase useCase =
+        new SortingUseCase(dataSource, algorithmSelector, resultOutput, algorithmFactory);
+    useCase.execute();
+
+    verify(dataSource).fetchData();
+    verify(algorithmSelector).selectAlgorithm();
+    verifyNoInteractions(resultOutput);
+  }
 }
-
